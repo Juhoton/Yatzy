@@ -1,0 +1,3 @@
+Main menu and Game GUI done, but the functionality is still missing. 
+
+aiming to finish by wednesday 21.12.2022
