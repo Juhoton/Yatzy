@@ -1,7 +1,6 @@
 import tkinter as tk
 import random
-import time
-
+from tkinter import ttk
 class MainMenuGUI():
     def __init__(self):
         self.window = tk.Tk()
@@ -37,66 +36,94 @@ class GameGUI():
         self.dices = [self.Die1, self.Die2, self.Die3, self.Die4, self.Die5]
 
         self.window = tk.Tk()
-
-        self.window.geometry("500x800")
+        self.window.geometry("600x1000")
         self.window.title("Yatzy")
+        self.dice1 = tk.PhotoImage(file='Dices\dice1.png')
+        self.dice2 = tk.PhotoImage(file='Dices\dice2.png')
+        self.dice3 = tk.PhotoImage(file='Dices\dice3.png')
+        self.dice4 = tk.PhotoImage(file='Dices\dice4.png')
+        self.dice5 = tk.PhotoImage(file='Dices\dice5.png')
+        self.dice6 = tk.PhotoImage(file='Dices\dice6.png')
 
-        self.scoreFrame = tk.Frame(master=self.window, background="black")
-
-        self.leftSideLabels = ["YATZY","Ones","Twos","Threes","Fours","Fives","Sixes","Bonus","MidSum","One Pair","Two Pairs","Three of a Kind","Four of a Kind","Small straight","Large straight","Full house","Chance","Yatzy","Score"]
-        self.y = 0
-        self.x = 0
-        for sideLabel in self.leftSideLabels:
-            self.createFrame(self.x, self.y, "label", sideLabel)
-            self.y += 1
-
-        self.x += 1
-        for player in self.players:
-            self.y = 0
-            self.createFrame(self.x, self.y, "label", "Player")
-            self.y += 1
-
-            for score in player.upperSection:
-                self.createFrame(self.x, self.y, "button", score)
-                self.y += 1
-
-            self.createFrame(self.x, self.y, "label", player.bonus)
-            self.y += 1
-            self.createFrame(self.x, self.y, "label", player.midSum)
-            self.y += 1
-
-            for score in player.lowerSection:
-                self.createFrame(self.x, self.y, "button", score)
-                self.y += 1
-
-            self.createFrame(self.x, self.y, "label", player.score)
-            self.x += 1
-
-        self.scoreFrame.pack()
+        self.createScoreGrid()
+        self.createDiceCheckButtons()
 
         self.window.mainloop()
 
+    def createScoreGrid(self):
+        self.scoreFrame = tk.Frame(master=self.window, background="black")
+        y = 0
+        x = 0
+        for sideLabel in ["YATZY","Ones","Twos","Threes","Fours","Fives","Sixes","Bonus","MidSum","One Pair","Two Pairs","Three of a Kind","Four of a Kind","Small straight","Large straight","Full house","Chance","Yatzy","Score"]:
+            self.createFrame(x, y, sideLabel)
+            y += 1
 
-    def createFrame(self,x,y,type,text):
-        if type == "button":
+        x += 1
+        for player in self.players:
+            y = 0
+            self.createFrame(x, y, "Player")
+            y += 1
+            for score in player.upperSection:
+                self.createFrame(x, y, score)
+                y += 1
+
+            self.createFrame(x, y, player.getBonus())
+            y += 1
+            self.createFrame(x, y, player.getMidSum())
+            y += 1
+            for score in player.lowerSection:
+                self.createFrame(x, y, score)
+                y += 1
+
+            self.createFrame(x, y, player.score)
+            x += 1
+
+        self.scoreFrame.pack()
+
+    def createFrame(self,x,y,text):
+        if text == None:
             frame = tk.Frame(master=self.scoreFrame,borderwidth=3)
             frame.grid(row=y, column=x, padx=2, pady=2)
             button = tk.Button(master=frame, text=text, width=15)
             button.pack(fill=tk.X)
-
-        if type == "label":
+        else:
             frame = tk.Frame(master=self.scoreFrame,borderwidth=3)
             frame.grid(row=y, column=x, padx=2, pady=2)
             label = tk.Label(master=frame, text=text, width=15)
             label.pack(fill=tk.X)
 
+    def createDiceCheckButtons(self):
+        self.diceCheckButtons = tk.Frame(master=self.window)
+        y = 0
+        x = 0
+        for die in self.dices:
+            self.createCheckButton(x, y, die)
+            x += 1
 
-        
+        self.diceCheckButtons.pack(side=tk.TOP)
 
+    def createCheckButton(self, x, y, die):
+        self.frame = tk.Frame(master=self.diceCheckButtons)
+        self.frame.grid(row=y, column=x, padx=2, pady=2)
+        self.label = tk.Label(master=self.frame, image=self.getDieImage(die))
+        self.label.pack()
+        self.on = tk.BooleanVar()
+        self.checkButton = tk.Checkbutton(master=self.frame, variable=self.on, onvalue=True, offvalue=False) # 
+        self.checkButton.pack()
 
-
-
-
+    def getDieImage(self, die):
+        if die.side == 1:
+            return self.dice1
+        if die.side == 2:
+            return self.dice2
+        if die.side == 3:
+            return self.dice3
+        if die.side == 4:
+            return self.dice4
+        if die.side == 5:
+            return self.dice5
+        if die.side == 6:
+            return self.dice6
 
 
 class PlayerGamestate:
@@ -108,8 +135,8 @@ class PlayerGamestate:
         self.fives = None
         self.sixes = None
         self.upperSection = (self.ones, self.twos, self.threes, self.fours, self.fives, self.sixes)
-        self.bonus = None
-        self.midSum = None
+        self.__bonus = 0
+        self.__midSum = 0
         
 
         self.onePair = None
@@ -124,10 +151,32 @@ class PlayerGamestate:
         self.score= None
         self.lowerSection = (self.onePair, self.twoPairs, self.threeOfAKind, self.fourOfAKind, self.smallStraight, self.largeStraight, self.fullHouse, self.chance, self.yatzy)
 
+    def getBonus(self):
+        self.checkBonus()
+        return self.__bonus
+
+    def getMidSum(self):
+        self.checkMidSum()
+        return self.__midSum
+
+    def checkBonus(self):
+        sum = 0
+        for value in self.upperSection:
+            if value != None:
+                sum += value
+        
+        if sum >= 63:
+            self.__bonus = 50
+
+    def checkMidSum(self):
+        self.__midSum = 0
+        for value in self.upperSection:
+            if value != None:
+                self.__midSum += value
+
 class Die:
     def __init__(self):
         self.rollDie()
-
 
     def rollDie(self):
         self.side = random.randint(1,6)

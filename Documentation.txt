@@ -1,3 +1,18 @@
 Main menu and Game GUI done, but the functionality is still missing. 
 
 aiming to finish by wednesday 21.12.2022
+
+21.12.2022 Update:
+Added dices into game gui. game gui still missing roll button and some text for instructions.
+Waaaayy too much to learn and problem solve to complete project today.
+Still missing:
+-Game logic
+-Scene changing
+-functionality for the buttons and checkbuttons in gamegui and main menu
+-way to save game. Aiming for pause menu with pressing esc, but still to be figured
+-SavedGamesGUI
+-some other stuff prob.
+
+everything doable, but it just takes time and patience.
+
+aiming to finish by somewhere the week after Christmas.
