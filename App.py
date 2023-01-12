@@ -3,10 +3,14 @@ import random
 from collections import Counter
 import pickle
 import os
+
+
+#Creates the mainMenu, and also handles the saved games menu
 class MainMenu():
     def __init__(self, window):
         self.createMainMenu()
 
+    #Divided into another method for creating the main menu again
     def createMainMenu(self):
         window.geometry("250x250")
         window.title("Yatzy")
@@ -21,10 +25,12 @@ class MainMenu():
 
         self.buttonFrame.place(relx=.5, rely=.5, anchor="center")
         
+    #Destroys the main menu, and starts a new game by calling Game() construktor
     def startGame(self):
         self.buttonFrame.destroy()
         Game(window)
 
+    #Switches into saved games menu
     def loadGame(self):
         self.buttonFrame.destroy()
         directory = "savedGames"
@@ -39,18 +45,16 @@ class MainMenu():
 
 
         self.buttonFrame.place(relx=.5, rely=.5, anchor="center")
-        
+
+    #Continues the game with a save file
     def startSavedGame(self, filename):
         with open ("savedGames/"+filename, "rb") as f:
             tempTuple = pickle.load(f)
         Game(window, tempTuple)
 
-
-class SavedGames():
-    pass
-
 class Game():
 
+    #Starts the game with either new playerstates, or continues from a save file
     def __init__(self, *args):
         window.geometry("600x900")
         window.title("Yatzy")
@@ -90,12 +94,15 @@ class Game():
         self.gameFrame.place(relx=.5, rely=.5, anchor="center")
         window.bind('<Escape>',lambda e: self.pauseMenu(e))
 
+    #Recreates all the frames. Used to update the frames
     def reCreateAll(self):
         self.scoreFrame.destroy()
         self.diceCheckButtons.destroy()
         self.createScoreGrid()
         self.createDices()
 
+    #Creates the scoregrid, where the players have their points, and also input their scores
+    #For loop logic for createFrame()
     def createScoreGrid(self):
         self.scoreFrame = tk.Frame(master=self.gameFrame, background="black")
         self.scoreButtons = []
@@ -127,6 +134,8 @@ class Game():
 
         self.scoreFrame.pack()
 
+    #Creates a single frame for the scoreboard. Makes labes or buttons depending if we want to be able to input stuff there
+    #Buttons input data with command=setScore()
     def createFrame(self,x,y,text,player):
         if self.players.index(player) != (self.playerTurn-1) or self.rollsLeft == 3:
             frame = tk.Frame(master=self.scoreFrame,borderwidth=3)
@@ -145,6 +154,7 @@ class Game():
             label = tk.Label(master=frame, text=text, width=15)
             label.pack(fill=tk.X)
 
+    #Creates the bottom section with the dices, checkButtons, and the roll button
     def createDices(self):
         self.diceCheckButtons = tk.Frame(master=self.gameFrame)
         y = 0
@@ -157,6 +167,7 @@ class Game():
         self.diceCheckButtons.pack(side=tk.TOP)
         return self.diceCheckButtons
 
+    #Creates a single die with a checkbutton under it.
     def createDie(self, x, y, die):
         self.frame = tk.Frame(master=self.diceCheckButtons)
         self.frame.grid(row=y, column=x, padx=2, pady=2)
@@ -165,6 +176,7 @@ class Game():
         self.checkButton = tk.Checkbutton(master=self.frame, variable= die.selected, onvalue=True, offvalue=False) # 
         self.checkButton.pack()
 
+    #Gets an image for the die
     def getDieImage(self, die):
         if die.side == 1:
             return self.dice1
@@ -179,13 +191,15 @@ class Game():
         if die.side == 6:
             return self.dice6
 
+    #Creates the rollButton, if there are rolls left
     def createRollButton(self):
         if self.rollsLeft != 0:
             frame = tk.Frame(master=self.diceCheckButtons,borderwidth=3)
             frame.grid(row=1, column=2)
             button = tk.Button(master=frame, text="Roll", width=15, command=self.rollDices)
             button.pack(fill=tk.X)
-        
+
+    #Rolls the unselected dices, and counts down the rollsLeft  
     def rollDices(self):
         self.rollsLeft -= 1
         if self.rollsLeft == 2:
@@ -200,10 +214,12 @@ class Game():
             self.createDices()
         self.checkPossibleScores()
 
+    #Updates the dice score onto the scoreboard, without destroying.
     def checkPossibleScores(self):
         for scoreButton in self.scoreButtons:
             scoreButton[2].config(text=PlayerGamestate.checkDiceValue(scoreButton[1],self.dices))
 
+    #Sets the score into selected frame, and then handles game logic and refresh
     def setScore(self,y):
         self.players[self.playerTurn-1].setScore(y,PlayerGamestate.checkDiceValue(y,self.dices))
         self.playerTurn +=1
@@ -211,7 +227,9 @@ class Game():
             self.playerTurn = 1
         self.rollsLeft = 3
         self.reCreateAll()
-    
+
+    #A pause menu keybinded into 'Esc'. Either saves the game, goes into the main menu, or return to the game.
+    #With the line you can set a custom filename for the save. Doesn't work with mulpi
     def pauseMenu(self,e):
         self.scoreFrame.destroy()
         self.diceCheckButtons.destroy()
@@ -290,6 +308,7 @@ class PlayerGamestate:
     def getScore(self):
         self.checkScore()
         return self.__score
+
     def checkBonus(self):
         sum = 0
         for value in self.getUpperSection():
@@ -345,7 +364,6 @@ class PlayerGamestate:
             case 17:
                 self.yatzy = score
                 
-
     @staticmethod
     def checkDiceValue(y, dices):
         tempList=[]
@@ -444,8 +462,7 @@ class Die:
         return (self.side, self.selected.get())
 
 
+#Program starts here
 window = tk.Tk()
-
 MainMenu(window)
-
 window.mainloop()
