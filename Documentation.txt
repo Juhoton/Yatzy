@@ -6,3 +6,6 @@ ja pythonin kielen vähän syvempää opiskelua.
     Ohjelma aukeaa luomalla MainMenu() luokan kautta aloitusikkunan, josta voi valita aloittaa uuden pelin, tai jatkaa vanhaa. Aloittamalla uuden, se luo tarvittavat asiat Game() konstruktorissa pelin toimintaan varten.
 Pelissä ei ole varsinaista valikkoa tai looppia, missä ohjelma pyörisi, vaan eri ikkunoista mennään toisille nappien ja niiden kutsuvien methodien avulla. 'Esc' nappulalla pystyy kesketyyää pelin, 
 jossa sitten voi tallentaa pelin haluamalla nimellä, ja/tai palata päämenuun. Olen kirjoittanut tarkemmin methodien ja luokkien toiminnasta koodiin itsessään, koska niitä on vain liika tuoda kaikkia tänne.
+Valitsin ikkunoiden välisen liikkumiseksi tuhoamisen ja rakentamisen, koska näytti helpommalta tavalta hoitaa monia eri ikkunoita. Pelin tallentaminen toimii picklen avulla omiin tiedostoihin, jossa yhdessä on yksi tuple tiedosto.
+Tiedostossa on pelaajatilat, nopat, pelaajavuoro ja heittojen määrä, joten pelin pitäisi palata takaisin oikeaan asemaan. 
+    Olen työssä siis käyttänyt tkinteriä tehdääkseen grafiikat peliin. counteria käytin noppien pisteiden laskemisen logiikkaan. Pickleä tallentaakseen olioita.

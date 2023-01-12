@@ -229,7 +229,7 @@ class Game():
         self.reCreateAll()
 
     #A pause menu keybinded into 'Esc'. Either saves the game, goes into the main menu, or return to the game.
-    #With the line you can set a custom filename for the save. Doesn't work with mulpi
+    #With the line you can set a custom filename for the save. Same name overwrites.
     def pauseMenu(self,e):
         self.scoreFrame.destroy()
         self.diceCheckButtons.destroy()
@@ -250,12 +250,14 @@ class Game():
 
         self.buttonFrame.place(relx=.5, rely=.5, anchor="center")
 
+    #returns to the game
     def back(self):
         self.buttonFrame.destroy()
         self.createScoreGrid()
         self.createDices()
         self.checkPossibleScores()
 
+    #Saves the game with tuple and pickle.
     def saveGame(self):
         tempDices = []
         for die in self.dices:
@@ -263,12 +265,15 @@ class Game():
         tempTuple = (self.players, self.playerTurn, self.rollsLeft, tempDices)
         with open("savedGames/" + self.saveEntry.get(), "wb") as f:
             pickle.dump(tempTuple, f, protocol=pickle.HIGHEST_PROTOCOL)
-    
+
+    #Goes into the main menu    
     def toMainMenu(self):
         self.buttonFrame.destroy()
         MainMenu(window)
 
 class PlayerGamestate:
+
+    #Creates a player state with empty values
     def __init__(self):
         self.ones = None
         self.twos = None
@@ -291,24 +296,30 @@ class PlayerGamestate:
         self.yatzy = None
         self.__score= 0
 
+    #Returns the upper section of the scores in a list
     def getUpperSection(self):
         return (self.ones, self.twos, self.threes, self.fours, self.fives, self.sixes)
 
+    #Returns the lower section of the scores in a list
     def getLowerSection(self):
         return (self.onePair, self.twoPairs, self.threeOfAKind, self.fourOfAKind, self.smallStraight, self.largeStraight, self.fullHouse, self.chance, self.yatzy)
 
+    #Returns the Bonus, after checking it.
     def getBonus(self):
         self.checkBonus()
         return self.__bonus
 
+    #Returns the mid sum, after checking it.
     def getMidSum(self):
         self.checkMidSum()
         return self.__midSum
 
+    #Returns the score, after checking it.
     def getScore(self):
         self.checkScore()
         return self.__score
 
+    #Checks if the sum of the upper section is over or equal to 63, gives 50 points if it is.
     def checkBonus(self):
         sum = 0
         for value in self.getUpperSection():
@@ -318,19 +329,22 @@ class PlayerGamestate:
         if sum >= 63:
             self.__bonus = 50
 
+    #Combines the upper section for the middle score
     def checkMidSum(self):
         self.__midSum = 0
         for value in self.getUpperSection():
             if value != None:
                 self.__midSum += value
 
+    #Combines all the scores
     def checkScore(self):
-        self.__score = self.getMidSum()
+        self.__score = self.getMidSum() + self.getBonus()
         for value in self.getLowerSection():
             if value != None:
                 self.__score += value
         return self.__score
 
+    #Sets the score against the y position on the scoreboard. Skips 7 and 8 because of bonus and midsum
     def setScore(self,y,score):
         match y:
             case 1:
@@ -363,7 +377,8 @@ class PlayerGamestate:
                 self.chance = score
             case 17:
                 self.yatzy = score
-                
+
+    #Main logic for checking the dice value against every single option                
     @staticmethod
     def checkDiceValue(y, dices):
         tempList=[]
@@ -444,6 +459,8 @@ class PlayerGamestate:
         return value
 
 class Die:
+
+    #Creates a new die, or an old one with save file
     def __init__(self, *args):
         if len(args) == 0:
             self.rollDie()
@@ -452,12 +469,15 @@ class Die:
             self.side = args[0][0]
             self.selected = tk.BooleanVar()
 
+    #Randomizes the number
     def rollDie(self):
         self.side = random.randint(1,6)
-    
+
+    #Changes the state, might not be needed though    
     def setSelected(self,state):
         self.selected = state
 
+    #Returns the data for the save file
     def getData(self):
         return (self.side, self.selected.get())
 
