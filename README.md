@@ -1,4 +1,4 @@
-# Yatzy
+# Yatzy Game
 
 Made for the course Programming practical work (ohjelmoinnin jatkokurssi). It is a working Yatzy game made from python and tkinter. 
 
